@@ -1,0 +1,11 @@
+Commands:
+    Start Venv ->
+        cd server
+        venv\Scripts\activate
+    
+    Run server (after started venv)->
+        python server.py
+
+    Run Next app ->
+        cd client/freight-system
+        npm run dev
