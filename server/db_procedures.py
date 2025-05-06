@@ -1,4 +1,4 @@
-import psycopg2, os, queries
+import psycopg2, os, queries, psycopg2.extras
 from dotenv import load_dotenv
 
 
@@ -13,10 +13,10 @@ def db_connect():
         database=os.getenv("DB_NAME"))
 
 
-def verify_user_and_password(user_code, user_password):
+def verify_login(user_code, user_password):
     conn = db_connect()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute(queries.SQL_VERIFY_USER_AND_PASSWORD, (user_code, user_password))
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_VERIFY_LOGIN, (user_code, user_password))
     user = cursor.fetchone()
     conn.close()
     return user
