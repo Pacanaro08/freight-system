@@ -27,7 +27,7 @@ function index() {
           .then((data) => {
             if (data) {
               if (data.valid == true) {
-                router.push('/branch')
+                router.push(`/branch?${login}`)
               } else {
                 setWarning('Usuário ou senha inválidos!')
               }
@@ -53,6 +53,9 @@ function index() {
         <h2 className='text-2xl font-bold text-center mb-7'>FREIGHT2U</h2>
         <div className='mb-4'>
           <input
+            onKeyDown={(e) => (
+              e.key === 'Enter' ? validateLogin() : null
+            )}
             className='w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-700'
             type='email'
             id='email'
@@ -62,6 +65,9 @@ function index() {
         </div>
         <div className='mb-7'>
           <input
+            onKeyDown={(e) => (
+              e.key === 'Enter' ? validateLogin() : null
+            )}
             className='w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-700'
             type='password'
             id='password'
@@ -78,7 +84,10 @@ function index() {
             </div>
           )
         }
-        <button onClick={() => validateLogin()} className='w-full bg-purple-700 text-white py-2 rounded hover:bg-purple-900 transition cursor-pointer'>
+        <button
+          onClick={() => validateLogin()}
+          className='w-full bg-purple-700 text-white py-2 rounded hover:bg-purple-900 transition cursor-pointer'
+        >
           Log in
         </button>
       </div>

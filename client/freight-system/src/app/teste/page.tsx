@@ -11,7 +11,10 @@ function teste() {
     return (
         <div className='w-screen h-screen bg-gray-900 flex items-center justify-center'>
             <div className="bg-gray-400 p-8 rounded shadow-md w-96">
-                <Select>
+                <Select
+                    className='w-full'
+                    size='small'
+                >
                     <MenuItem>1</MenuItem>
                     <MenuItem>2</MenuItem>
                     <MenuItem>3</MenuItem>
