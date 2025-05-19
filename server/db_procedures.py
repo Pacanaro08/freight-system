@@ -21,10 +21,20 @@ def verify_login(user_code, user_password):
     conn.close()
     return user
 
-def list_branches(user_code):
+
+def list_companies(user_code):
     conn = db_connect()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cursor.execute(queries.SQL_LIST_USER_BRANCHES, (user_code))
-    list = cursor.fetchall
+    cursor.execute(queries.SQL_LIST_USER_COMPANIES, (user_code,))
+    list = cursor.fetchall()
+    conn.close()
+    return list
+
+
+def list_branches(user_code, company_id):
+    conn = db_connect()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_LIST_USER_BRANCHES, (user_code, company_id))
+    list = cursor.fetchall()
     conn.close()
     return list

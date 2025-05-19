@@ -3,7 +3,8 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 import db_procedures
-import os, jwt
+import os
+import jwt
 
 
 load_dotenv()
@@ -21,35 +22,56 @@ def user_and_password():
     user_password = data.get('user_password')
 
     if user_code and user_password:
-        is_ok = db_procedures.verify_login(user_code, user_password)
-        if is_ok:
-            token = jwt.encode({'user': user_code, 'exp': datetime.now() + timedelta(hours=1)},
+        user = db_procedures.verify_login(user_code, user_password)
+        if user['valid'] == True:
+            token = jwt.encode({'user': user_code, 'exp': datetime.now(timezone.utc) + timedelta(hours=1)},
                                app.config['SECRET_KEY'], algorithm='HS256')
-            response = jsonify({'message': 'Login Successfully!'})
-            response.set_cookie('token', token, httponly=True, samesite='Lax')
+            response = jsonify({'message': 'Login Successfully!', 'code': 200})
+            response.set_cookie('token', token, httponly=True, samesite='None', secure=True)
 
             return response
-        return jsonify({'message': 'Login failed!'}), 401
-    return jsonify({'message': 'Missing required fields!'}), 401
+        return jsonify({'message': 'Login failed!', 'code': 401}), 401
+    return jsonify({'message': 'Missing required fields!', 'code': 401}), 401
+
+
+@app.route('/db-procedures/companies', methods=['POST'])
+def get_companies():
+    token = request.cookies.get('token')
+    if not token:
+        return jsonify({'message': 'Unnauthorized', 'code': 401}), 401
+    
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        companies_list = db_procedures.list_companies(data['user'])
+        return jsonify({'companies': companies_list})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Expired token', 'code': 401}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token', 'code': 401}), 401
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        return jsonify({'message': 'Internal server error', 'code': 500}), 500
 
 
 @app.route('/db-procedures/branches', methods=['POST'])
 def get_branches():
+    data = request.json
+    company_id = data.get('company_id')
     token = request.cookies.get('token')
     if not token:
-        return jsonify({'message': 'Unnauthorized'}), 401
+        return jsonify({'message': 'Unnauthorized', 'code': 401}), 401
     
     try:
         data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        branches_list = db_procedures.list_branches(data['user'])
+        branches_list = db_procedures.list_branches(data['user'], company_id)
         return jsonify({'branches': branches_list})
     except jwt.ExpiredSignatureError:
-        return jsonify({'message': 'Expired token'}), 401
+        return jsonify({'message': 'Expired token', 'code': 401}), 401
     except jwt.InvalidTokenError:
-        return jsonify({'message': 'Invalid token'}), 401
+        return jsonify({'message': 'Invalid token', 'code': 401}), 401
     except Exception as e:
         print(f"Erro inesperado: {str(e)}")
-        return jsonify({'message': 'Internal server error'}), 500
+        return jsonify({'message': 'Internal server error', 'code': 500}), 500
 
 
 if __name__ == "__main__":

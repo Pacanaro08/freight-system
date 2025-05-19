@@ -15,6 +15,7 @@ function index() {
       try {
         fetch('http://127.0.0.1:8000/db-procedures/login', {
           method: 'POST',
+          credentials: 'include', 
           headers: {
             'Content-type': 'application/json'
           },
@@ -26,8 +27,8 @@ function index() {
           .then(response => response.json())
           .then((data) => {
             if (data) {
-              if (data.valid == true) {
-                router.push(`/branch?${login}`)
+              if (data.code == 200) {
+                router.push('/branch')
               } else {
                 setWarning('Usuário ou senha inválidos!')
               }
