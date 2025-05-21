@@ -32,18 +32,11 @@ function selectBranch() {
                 .then(response => response.json())
                 .then((data) => {
                     if (data) {
-                        const key = `${data.code} - ${data.message}`
-                        switch (key) {
-                            case '401 - Unnauthorized':
-                                router.push('./')
-                                break;
-                            case '200 - Success':
-                                setScreen(true)
-                                setCompanies(data.companies)
-                                break;
-                            default:
-                                setWarning(key)
-                                break;
+                        if (data.code == 200) {
+                            setScreen(true)
+                            setCompanies(data.companies)
+                        } else {
+                            router.push('./')
                         }
                     } else {
                         setWarning('Something went wrong. Try again later.')

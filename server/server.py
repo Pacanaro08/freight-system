@@ -114,5 +114,23 @@ def get_branches():
         return jsonify({'message': 'Internal server error', 'code': 500}), 500
 
 
+@app.route('/tokens/get-authenticated-tokens', methods=['GET'])
+def get_tokens():
+    token = request.cookies.get('token')
+    if not token:
+        return jsonify({'message': 'Unnauthorized', 'code': 401}), 401
+    
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        return jsonify({'message': 'Success', 'code': 200, 'user': data['user'], 'company': data['company'], 'branch': data['branch']})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Expired token', 'code': 401}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token', 'code': 401}), 401
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        return jsonify({'message': 'Internal server error', 'code': 500}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=8000)
