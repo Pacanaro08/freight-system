@@ -1,7 +1,7 @@
 'use client'
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface CompanyProps {
     company_id: string,
@@ -33,26 +33,26 @@ function selectBranch() {
                 .then((data) => {
                     if (data) {
                         if (data.code == 200) {
-                            setScreen(true)
-                            setCompanies(data.companies)
+                            setScreen(true);
+                            setCompanies(data.companies);
                         } else {
-                            router.push('./')
+                            router.push('./');
                         }
                     } else {
-                        setWarning('Something went wrong. Try again later.')
+                        setWarning('Something went wrong. Try again later.');
                     }
                 })
                 .catch((error) => {
-                    setWarning(error)
+                    setWarning(error);
                 })
-        } catch (e: any) {
-            setWarning(e)
-        }
-    }, [])
+        } catch (e) {
+            setWarning(String(e));
+        };
+    }, []);
 
     function handleSelectedCompany(currentCompany: string) {
         if (currentCompany) {
-            setSelectedCompany(currentCompany)
+            setSelectedCompany(currentCompany);
 
             try {
                 fetch('http://127.0.0.1:8000/db-procedures/branches', {
@@ -68,33 +68,33 @@ function selectBranch() {
                     .then(response => response.json())
                     .then((data) => {
                         if (data) {
-                            const key = `${data.code} - ${data.message}`
+                            const key = `${data.code} - ${data.message}`;
                             switch (key) {
                                 case '200 - Success':
-                                    setBranches(data.branches)
+                                    setBranches(data.branches);
                                     break;
                                 default:
-                                    setWarning(key)
+                                    setWarning(key);
                                     break;
                             }
                         } else {
-                            setWarning('Something went wrong. Try again later.')
+                            setWarning('Something went wrong. Try again later.');
                         }
                     })
                     .catch((error) => {
-                        setWarning(error)
+                        setWarning(error);
                     })
-            } catch (e: any) {
-                setWarning(e)
-            }
+            } catch (e) {
+                setWarning(String(e));
+            };
         } else {
-            setBranches([])
-        }
-    }
+            setBranches([]);
+        };
+    };
 
     function goBack() {
-        router.back()
-    }
+        router.back();
+    };
 
     function logIn() {
         if (selectedBranch && selectedCompany) {
@@ -113,40 +113,40 @@ function selectBranch() {
                     .then(response => response.json())
                     .then((data) => {
                         if (data) {
-                            const key = `${data.code} - ${data.message}`
+                            const key = `${data.code} - ${data.message}`;
                             switch (key) {
                                 case '200 - Success':
-                                    router.push('/home')
+                                    router.push('/home');
                                     break;
                                 default:
-                                    setWarning(key)
+                                    setWarning(key);
                                     break;
                             }
                         } else {
-                            setWarning('Something went wrong. Try again later.')
+                            setWarning('Something went wrong. Try again later.');
                         }
                     })
                     .catch((error) => {
-                        setWarning(error)
+                        setWarning(error);
                     })
-            } catch (e: any) {
-                setWarning(e)
-            }
+            } catch (e) {
+                setWarning(String(e));
+            };
         } else {
-            setWarning('Select Company and Branch!')
-        }
-    }
+            setWarning('Select Company and Branch!');
+        };
+    };
 
     return (
         <>
             {
                 screen && (
                     <div className='w-screen h-screen bg-gray-900 flex items-center justify-center'>
-                        <div className="bg-gray-400 p-8 rounded shadow-md w-96">
-                            <h2 className="text-2xl font-bold text-center mb-7">Branches</h2>
-                            <div className="mb-4">
+                        <div className='bg-gray-400 p-8 rounded shadow-md w-96'>
+                            <h2 className='text-2xl font-bold text-center mb-7'>Branches</h2>
+                            <div className='mb-4'>
                                 <select
-                                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-700"
+                                    className='w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-700'
                                     onChange={(e) => handleSelectedCompany(e.target.value)}
                                 >
                                     <option key={''} value={''}>Select the Company</option>
@@ -159,9 +159,9 @@ function selectBranch() {
                                     }
                                 </select>
                             </div>
-                            <div className="mb-7">
+                            <div className='mb-7'>
                                 <select
-                                    className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-700"
+                                    className='w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-700'
                                     onChange={(e) => setSelectedBranch(e.target.value)}
                                 >
                                     <option key={''} value={''}>Select the Branch</option>
@@ -183,10 +183,10 @@ function selectBranch() {
                                     </div>
                                 )
                             }
-                            <button onClick={() => logIn()} className="w-full bg-purple-700 text-white py-2 rounded hover:bg-purple-900 transition mb-3 cursor-pointer">
+                            <button onClick={() => logIn()} className='w-full bg-purple-700 text-white py-2 rounded hover:bg-purple-900 transition mb-3 cursor-pointer'>
                                 Select
                             </button>
-                            <button onClick={() => goBack()} className="w-full bg-gray-300 text-black py-2 rounded hover:bg-gray-500 transition cursor-pointer">
+                            <button onClick={() => goBack()} className='w-full bg-gray-300 text-black py-2 rounded hover:bg-gray-500 transition cursor-pointer'>
                                 Return
                             </button>
                         </div>

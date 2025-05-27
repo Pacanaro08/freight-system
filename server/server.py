@@ -122,7 +122,27 @@ def get_tokens():
     
     try:
         data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
-        return jsonify({'message': 'Success', 'code': 200, 'user': data['user'], 'company': data['company'], 'branch': data['branch']})
+        return jsonify({'message': 'Success', 'code': 200, 'user': data['user'], 
+                        'company': data['company'], 'branch': data['branch']})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Expired token', 'code': 401}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token', 'code': 401}), 401
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        return jsonify({'message': 'Internal server error', 'code': 500}), 500
+
+
+@app.route('/db-procedures/get-users', methods=['GET'])
+def get_users():
+    token = request.cookies.get('token')
+    if not token:
+        return jsonify({'message': 'Unnauthorized', 'code': 401}), 401
+    
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        users_list, headers = db_procedures.list_users(data['company'], data['branch'])
+        return jsonify({'message': 'Success', 'code': 200, 'users': users_list, 'headers': headers})
     except jwt.ExpiredSignatureError:
         return jsonify({'message': 'Expired token', 'code': 401}), 401
     except jwt.InvalidTokenError:

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 function index() {
 
-  const [warning, setWarning] = useState('')
+  const [warning, setWarning] = useState('');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -28,25 +28,25 @@ function index() {
           .then((data) => {
             if (data) {
               if (data.code == 200) {
-                router.push('/branch')
+                router.push('/branch');
               } else {
-                setWarning('Usuário ou senha inválidos!')
+                setWarning('Usuário ou senha inválidos!');
               }
             } else {
-              setWarning('Ocorreu um erro, tente novamente mais tarde!')
+              setWarning('Ocorreu um erro, tente novamente mais tarde!');
             }
           })
           .catch((error) => {
-            setWarning(error)
-          })
-      } catch (err) {
-        console.log(err)
-        setWarning('Ocorreu um erro, tente novamente mais tarde!')
-      }
+            setWarning(error);
+          });
+      } catch (e) {
+        console.log(e);
+        setWarning('Ocorreu um erro, tente novamente mais tarde!');
+      };
     } else {
-      setWarning('Insira Login e Senha!')
+      setWarning('Insira Login e Senha!');
     };
-  }
+  };
 
   return (
     <div className='w-screen h-screen bg-gray-900 flex items-center justify-center'>

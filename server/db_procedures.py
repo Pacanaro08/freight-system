@@ -38,3 +38,13 @@ def list_branches(user_code, company_id):
     list = cursor.fetchall()
     conn.close()
     return list
+
+
+def list_users(company_id, branch_id):
+    conn = db_connect()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_LIST_BRANCH_USERS, (company_id, branch_id))
+    column_names = [desc[0] for desc in cursor.description] 
+    list = cursor.fetchall()
+    conn.close()
+    return list, column_names
