@@ -3,12 +3,9 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { validateToken } from "../utils/validate-token";
+import TokenResponse from "../utils/interfaces/token-response";
 import Grid from "../components/grid";
 
-interface TokenResponse {
-    message: string,
-    code: number
-};
 
 function displayUsers() {
 

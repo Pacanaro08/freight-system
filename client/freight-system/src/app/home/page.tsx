@@ -3,16 +3,13 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { validateToken } from '../utils/validate-token';
+import TokenResponse from '../utils/interfaces/token-response';
 
 const homeButtons = 'w-full h-full py-10 bg-purple-700 text-white cursor-pointer rounded-b-md hover:bg-purple-800';
 const leftButton = `${homeButtons} rounded-tr-4xl`;
 const middleButton = `${homeButtons} rounded-t-4xl`;
 const rightButton = `${homeButtons} rounded-tl-4xl`;
 
-interface TokenResponse {
-    message: string,
-    code: number,
-}
 
 function homepage() {
 

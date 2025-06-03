@@ -1,7 +1,4 @@
-interface TokenResponse {
-    message: string,
-    code: number
-}
+import TokenResponse from "./interfaces/token-response";
 
 async function validateToken(): Promise<TokenResponse> {
 
