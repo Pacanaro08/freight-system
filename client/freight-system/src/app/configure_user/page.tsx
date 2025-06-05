@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation";
 import { validateToken } from "../utils/validate-token";
+import { UserStructure } from "../utils/objects-structures";
 import TokenResponse from "../utils/interfaces/token-response";
 import FieldsProps from "../utils/interfaces/form-fields";
 import Form from "../components/form";
-import UserStructure from "../utils/objects-structures";
 
 
 function configureUser() {
@@ -14,18 +14,18 @@ function configureUser() {
     const [screen, setScreen] = useState(true);
     const router = useRouter();
 
-    // useEffect(() => {
-    //     async function fetchToken() {
-    //         const response: TokenResponse = await validateToken()
-    //         if (response.code == 200) {
-    //             setScreen(true);
-    //         } else {
-    //             router.push('./');
-    //         }
-    //     }
+    useEffect(() => {
+        async function fetchToken() {
+            const response: TokenResponse = await validateToken()
+            if (response.code == 200) {
+                setScreen(true);
+            } else {
+                router.push('./');
+            }
+        }
 
-    //     fetchToken();
-    // }, [])
+        fetchToken();
+    }, [])
 
     return (
         <>
@@ -40,7 +40,7 @@ function configureUser() {
                                 </div>
                             </div>
                         </div>
-                        <Form fields={UserStructure} />
+                        <Form fields={UserStructure()} />
                     </div>
                 )
             }

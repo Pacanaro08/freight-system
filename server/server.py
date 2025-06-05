@@ -54,10 +54,14 @@ def authenticate_user():
         if not company_id and not branch_id:
             return jsonify({'message': 'Missing required fields', 'code': 400}), 400
         
+        names = db_procedures.company_and_branch_names(company_id, branch_id)
+        
         new_token = jwt.encode({
             'user': user_code,
             'company': company_id,
+            'company_name': names['company_name'],
             'branch': branch_id,
+            'branch_name': names['branch_name'],
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }, app.config['SECRET_KEY'], algorithm='HS256')
             
@@ -123,7 +127,8 @@ def get_tokens():
     try:
         data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
         return jsonify({'message': 'Success', 'code': 200, 'user': data['user'], 
-                        'company': data['company'], 'branch': data['branch']})
+                        'company': data['company'], 'branch': data['branch'],
+                        'company_name': data['company_name'], 'branch_name': data['branch_name']})
     except jwt.ExpiredSignatureError:
         return jsonify({'message': 'Expired token', 'code': 401}), 401
     except jwt.InvalidTokenError:

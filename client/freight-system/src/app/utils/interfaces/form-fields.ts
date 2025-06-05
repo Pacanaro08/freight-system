@@ -4,6 +4,8 @@ interface FieldsProps {
     id?: string | undefined,
     placeholder?: string | undefined,
     options?: string[] | undefined,
+    disabled?: boolean | undefined,
+    maxLength?: number | undefined,
 }
 
 export default FieldsProps

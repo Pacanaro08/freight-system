@@ -11,7 +11,9 @@ async function validateToken(): Promise<TokenResponse> {
         const data = await response.json();
 
         if (data) {
-            return { 'message': data.message, 'code': data.code };
+            return { 'message': data.message, 'code': data.code, 'user': data.user, 
+                'company': data.company, 'companyName': data.company_name, 
+                'branch': data.branch, 'branchName': data.branch_name };
         } else {
             return { 'message': 'Something went wrong. Try again later.', 'code': 500 };
         }

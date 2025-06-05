@@ -48,3 +48,13 @@ def list_users(company_id, branch_id):
     list = cursor.fetchall()
     conn.close()
     return list, column_names
+
+
+def company_and_branch_names(company_id, branch_id):
+    conn = db_connect()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_COMPANY_AND_BRANCH_NAMES, (company_id, branch_id))
+    names = cursor.fetchone()
+    conn.close()
+    return names
+
