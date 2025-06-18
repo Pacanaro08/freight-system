@@ -58,3 +58,17 @@ def company_and_branch_names(company_id, branch_id):
     conn.close()
     return names
 
+
+def insert_user(user_data, company_id, branch_id):
+    usercode = user_data.get('usercode')
+    username = user_data.get('username')
+    userpassword = user_data.get('userpassword')
+    useremail = user_data.get('useremail')
+    userstatus = user_data.get('userstatus')
+
+    conn = db_connect()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_INSERT_USER, (usercode, username, userpassword, useremail, userstatus, company_id, branch_id))
+    conn.commit()
+    conn.close()
+

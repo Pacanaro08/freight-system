@@ -6,13 +6,13 @@ import FieldsProps from "./interfaces/form-fields"
 
 
 const UserStructureBase: FieldsProps[] = [
-    { className: `${InputClass}`, type: 'text', id: '1', placeholder: 'User Code', maxLength: 50 },
-    { className: `${InputClass}`, type: 'text', id: '2', placeholder: 'Name', maxLength: 100 },
-    { className: `${InputClass}`, type: 'text', id: '3', placeholder: 'E-Mail', maxLength: 100 },
-    { className: `${InputClass}`, type: 'password', id: '4', placeholder: 'Password', maxLength: 50 },
-    { className: `${InputClass}`, type: 'select', id: '5', placeholder: 'Status', options: ['Active', 'Inactive'] },
-    { className: `${DisabledInputClass}`, type: 'text', id: '6', placeholder: '', disabled: true },
-    { className: `${DisabledInputClass}`, type: 'text', id: '7', placeholder: '', disabled: true },
+    { className: `${InputClass}`, type: 'text', id: '1', key: 'usercode', required: true, placeholder: 'User Code *', maxLength: 50 },
+    { className: `${InputClass}`, type: 'text', id: '2', key: 'username', required: true, placeholder: 'Name *', maxLength: 100 },
+    { className: `${InputClass}`, type: 'text', id: '3', key: 'useremail', required: true, placeholder: 'E-Mail *', maxLength: 100 },
+    { className: `${InputClass}`, type: 'password', id: '4', key: 'userpassword', required: true, placeholder: 'Password *', maxLength: 50 },
+    { className: `${InputClass}`, type: 'select', id: '5', key: 'userstatus', required: true, placeholder: 'Status *', options: ['Active', 'Inactive'] },
+    { className: `${DisabledInputClass}`, type: 'text', id: '6', key: 'usercompany', placeholder: 'Company', disabled: true },
+    { className: `${DisabledInputClass}`, type: 'text', id: '7', key: 'userbranch', placeholder: 'Branch', disabled: true },
 ]
 
 
@@ -29,11 +29,11 @@ function UserStructure() {
 
     const updatedUserStructure = UserStructureBase.map(field => {
         if (field.id === '6') {
-            return { ...field, placeholder: list?.companyName || "Loading..." };
+            return { ...field, value: list?.companyName || "Loading..." };
         }
 
         if (field.id === '7') {
-            return { ...field, placeholder: list?.branchName || "Loading..." };
+            return { ...field, value: list?.branchName || "Loading..." };
         }
 
         return field;

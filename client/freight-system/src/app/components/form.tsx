@@ -1,12 +1,32 @@
 'use client'
 
+import { useEffect, useState } from "react"
 import FieldsProps from "../utils/interfaces/form-fields"
 
 interface FormProps {
-    fields: FieldsProps[],
+    fields?: FieldsProps[],
+    filledFiedls?: string[],
+    handleFinalAnswer?: any;
 }
 
-const Form: React.FC<FormProps> = ({ fields }) => {
+const Form: React.FC<FormProps> = ({ fields, handleFinalAnswer }) => {
+    const [formAnswer, setFormAnswer] = useState<{ [key: string]: string | number | any }>({})
+
+    useEffect(() => {
+        if (handleFinalAnswer) {
+            handleFinalAnswer(formAnswer);
+        }
+    }, [formAnswer]);
+
+    const handleAnswer = (
+        key: string | any,
+        answer: string | number | any,
+    ) => {
+        setFormAnswer((prevData) => ({
+            ...prevData,
+            [key]: answer,
+        }));
+    }
 
     return (
         <div className="flex justify-center items-center">
@@ -24,6 +44,8 @@ const Form: React.FC<FormProps> = ({ fields }) => {
                                         placeholder={field.placeholder}
                                         disabled={field.disabled}
                                         maxLength={field.maxLength}
+                                        onChange={(e) => handleAnswer(field.key, e.target.value)}
+                                        value={field.value}
                                     >
                                     </input>
                                 )
@@ -31,8 +53,8 @@ const Form: React.FC<FormProps> = ({ fields }) => {
 
                             if (field.type === 'select' && field.options) {
                                 return (
-                                    <select id={field.id} key={field.id} className={field.className}>
-                                        <option key={''} value={''} className="italic">Select Status</option>
+                                    <select onChange={(e) => handleAnswer(field.key, e.target.value)} id={field.id} key={field.id} className={field.className}>
+                                        <option key={''} value={''} className="italic">Select Status *</option>
                                         {
                                             field.options.map((option, index) => (
                                                 <option key={index} value={option}>{option}</option>

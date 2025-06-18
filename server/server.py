@@ -157,5 +157,26 @@ def get_users():
         return jsonify({'message': 'Internal server error', 'code': 500}), 500
 
 
+@app.route('/configure_user/insert', methods=['POST'])
+def insertUser():
+    data = request.json
+    user_data = data.get('user_data')
+    token = request.cookies.get('token')
+    if not token:
+        return jsonify({'message': 'Unnauthorized', 'code': 401}), 401
+    
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        db_procedures.insert_user(user_data, data['company'], data['branch'])
+        return jsonify({'message': 'Success', 'code': 200})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Expired token', 'code': 401}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token', 'code': 401}), 401
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        return jsonify({'message': 'Internal server error', 'code': 500}), 500
+    
+    
 if __name__ == "__main__":
     app.run(debug=True, port=8000)
