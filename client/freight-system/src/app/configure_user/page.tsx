@@ -17,11 +17,15 @@ const userBase = {
     'userstatus': 'Status',
 }
 
+type Warning = {
+    message: string,
+    type: string,
+}
+
 function configureUser() {
 
     const [screen, setScreen] = useState(true);
-    const [warning, setWarning] = useState('');
-    const [success, setSuccess] = useState('');
+    const [warning, setWarning] = useState({} as Warning);
     const [finalAnswer, setFinalAnswer] = useState({});
     const router = useRouter();
 
@@ -71,12 +75,12 @@ function configureUser() {
             });
 
             if (error) {
-                setWarning(`Missing: ${fields.substring(0, fields.length - 2)}`);
+                setWarning({ message: `Missing: ${fields.substring(0, fields.length - 2)}`, type: 'error' });
             } else {
                 isExistent(user_code, user_email);
             };
         } else {
-            setWarning('Fill all required Fields!');
+            setWarning({ message: 'Fill all required Fields!', type: 'error' });
         };
     };
 
@@ -102,11 +106,11 @@ function configureUser() {
                             setWarning(data.message);
                         };
                     } else {
-                        setWarning('Something went wrong. Try again later.');
+                        setWarning({ message: 'Something went wrong. Try again later.', type: 'error' });
                     };
                 });
         } catch (e) {
-            setWarning(String(e));
+            setWarning({ message: String(e), type: 'error' });
         };
     };
 
@@ -128,26 +132,26 @@ function configureUser() {
                         const key = `${data.code} - ${data.message}`;
                         switch (key) {
                             case '200 - Success':
-                                setSuccess('Success!')
+                                setWarning({ message: 'Success!', type: 'success'})
                                 setTimeout(() => {
                                     router.push('/users');
                                 }, 1000)
                                 break;
                             default:
-                                setWarning(key);
+                                setWarning({ message: key, type: 'error' });
                                 break;
                         };
                     } else {
-                        setWarning('Something went wrong. Try again later.');
+                        setWarning({ message: 'Something went wrong. Try again later.', type: 'error' });
                     };
                 });
         } catch (e) {
-            setWarning(String(e));
+            setWarning({ message: String(e), type: 'error' });
         };
     };
 
     function handleMessages() {
-        setWarning('');
+        setWarning({ message: '', type: 'error' });
     };
 
     return (
@@ -155,18 +159,11 @@ function configureUser() {
             {
                 screen && (
                     <div className='bg-gray-900 min-h-screen flex flex-col'>
-                        {warning && (
+                        {warning.message && (
                             <WarningToast
-                                message={warning}
+                                message={warning.message}
                                 onClose={() => handleMessages()}
-                                type='error'
-                            />
-                        )}
-                        {success && (
-                            <WarningToast
-                                message={success}
-                                onClose={() => handleMessages()}
-                                type='success'
+                                type={warning.type}
                             />
                         )}
                         <div className='bg-gray-700 my-10 min-w-[800px] max-w-4xl w-full mx-auto rounded-lg p-5'>

@@ -15,10 +15,15 @@ type User = {
     user: string,
 }
 
+type Warning = {
+    message: string,
+    type: string,
+}
+
 function displayUsers() {
 
     const [screen, setScreen] = useState(false);
-    const [warning, setWarning] = useState('');
+    const [warning, setWarning] = useState({} as Warning);
     const [userModal, setUserModal] = useState('');
     const [users, setUsers] = useState([]);
     const [headers, setHeaders] = useState<string[]>();
@@ -50,19 +55,19 @@ function displayUsers() {
                         setUsers(data.users)
                         setHeaders(data.headers)
                     } else {
-                        setWarning('Something went wrong. Try again later.')
+                        setWarning({message:'Something went wrong. Try again later.', type:'error'})
                     }
                 })
                 .catch((error) => {
-                    setWarning(error);
+                    setWarning({message:error, type:'error'});
                 })
         } catch (e) {
-            setWarning(String(e));
+            setWarning({message:String(e), type:'error'});
         }
     }
 
     function handleMessages() {
-        setWarning('')
+        setWarning({message:'', type:''})
     }
 
     function onDelete(user: User) {
@@ -92,26 +97,25 @@ function displayUsers() {
                         const key = `${data.code} - ${data.message}`;
                         switch (key) {
                             case '200 - Success':
-                                setWarning('Success!')
+                                setWarning({message:'Success!', type:'success'})
                                 break;
                             default:
-                                setWarning(key);
+                                setWarning({message:key, type:'error'});
                                 break;
                         };
                     } else {
-                        setWarning('Something went wrong. Try again later.');
+                        setWarning({message:'Something went wrong. Try again later.', type:'error'})
                     };
                 })
                 .finally(() => setUserModal(''))
                 .finally(() => getUsers())
         } catch (e) {
-            setWarning(String(e))
+            setWarning({message:String(e), type:'error'});
         }
     }
 
     function onModalNo() {
         setUserModal('')
-        console.log('no')
     }
 
     return (
@@ -119,11 +123,11 @@ function displayUsers() {
             {
                 screen && (
                     <>
-                        {warning && (
+                        {warning.message && (
                             <WarningToast
-                                message={warning}
+                                message={warning.message}
                                 onClose={() => handleMessages()}
-                                type='error'
+                                type={warning.type}
                             />
 
                         )}
