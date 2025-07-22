@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation";
-import { validateToken } from "../utils/validate-token";
-import { UserStructure } from "../utils/objects-structures";
-import TokenResponse from "../utils/interfaces/token-response";
-import FieldsProps from "../utils/interfaces/form-fields";
-import Form from "../components/form";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { validateToken } from '../utils/validate-token';
+import { UserStructure } from '../utils/objects-structures';
+import WarningToast from '../components/warning-toast';
+import TokenResponse from '../utils/interfaces/token-response';
+import Form from '../components/form';
 
 
 const userBase = {
@@ -20,8 +20,8 @@ const userBase = {
 function configureUser() {
 
     const [screen, setScreen] = useState(true);
-    const [warning, setWarning] = useState(false);
-    const [warningMessage, setWarningMessage] = useState('');
+    const [warning, setWarning] = useState('');
+    const [success, setSuccess] = useState('');
     const [finalAnswer, setFinalAnswer] = useState({});
     const router = useRouter();
 
@@ -32,44 +32,83 @@ function configureUser() {
                 setScreen(true);
             } else {
                 router.push('./');
-            }
-        }
+            };
+        };
 
         fetchToken();
-    }, [])
+    }, []);
 
     function formFinalAnswer(answers: { [key: string]: string | number | any }) {
-        setFinalAnswer(answers)
+        setFinalAnswer(answers);
     }
 
     function handleFinalAnswer() {
-        let error = false
-        let fields = ''
+        let error = false;
+        let user_code: any = '';
+        let user_email: any = '';
+        let fields = '';
 
         if (finalAnswer && Object.keys(finalAnswer).length > 0) {
             Object.keys(userBase).map((value: string, index: number) => {
                 if (value in finalAnswer) {
                     if (Object.values(finalAnswer)[index] === '') {
-                        fields += Object.values(userBase)[index] + ', '
-                        error = true
-                    }
+                        fields += Object.values(userBase)[index] + ', ';
+                        error = true;
+                    } else {
+                        let field = Object.keys(userBase)[index]
+                        if (field === 'usercode') {
+                            user_code = Object.values(finalAnswer)[index];
+                        };
+
+                        if (field === 'useremail') {
+                            user_email = Object.values(finalAnswer)[index];
+                        };
+                    };
                 } else {
-                    fields += Object.values(userBase)[index] + ', '
-                    error = true
-                }
+                    fields += Object.values(userBase)[index] + ', ';
+                    error = true;
+                };
             });
 
             if (error) {
-                setWarningMessage(`Missing: ${fields.substring(0, fields.length - 2)}`)
+                setWarning(`Missing: ${fields.substring(0, fields.length - 2)}`);
             } else {
-                insertDB()
-            }
-            setWarning(error)
+                isExistent(user_code, user_email);
+            };
         } else {
-            setWarning(true)
-            setWarningMessage('Fill all required Fields!')
-        }
-    }
+            setWarning('Fill all required Fields!');
+        };
+    };
+
+    function isExistent(user_code: string, user_email: string) {
+        try {
+            fetch('http://127.0.0.1:8000/configure_user/existence', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'user_code': user_code,
+                    'user_email': user_email,
+                })
+            })
+                .then(response => response.json())
+                .then((data) => {
+                    if (data) {
+                        if (data.code == 200) {
+                            insertDB();
+                        } else {
+                            setWarning(data.message);
+                        };
+                    } else {
+                        setWarning('Something went wrong. Try again later.');
+                    };
+                });
+        } catch (e) {
+            setWarning(String(e));
+        };
+    };
 
     function insertDB() {
         try {
@@ -89,34 +128,52 @@ function configureUser() {
                         const key = `${data.code} - ${data.message}`;
                         switch (key) {
                             case '200 - Success':
-                                router.push('/users');
-                                console.log(key)
+                                setSuccess('Success!')
+                                setTimeout(() => {
+                                    router.push('/users');
+                                }, 1000)
                                 break;
                             default:
-                                setWarningMessage(key);
-                                console.log(key)
+                                setWarning(key);
                                 break;
-                        }
+                        };
                     } else {
-                        setWarningMessage('Something went wrong. Try again later.');
-                        console.log('Something went wrong. Try again later.')
-                    }
-                })
+                        setWarning('Something went wrong. Try again later.');
+                    };
+                });
         } catch (e) {
-            console.log(String(e))
-        }
-    }
+            setWarning(String(e));
+        };
+    };
+
+    function handleMessages() {
+        setWarning('');
+    };
 
     return (
         <>
             {
                 screen && (
-                    <div className="bg-gray-900 min-h-screen flex flex-col">
-                        <div className="bg-gray-700 my-10 min-w-[800px] max-w-4xl w-full mx-auto rounded-lg p-5">
-                            <div className="grid grid-cols-2 h-fit gap-x-10">
-                                <div className="w-full grid grid-cols-2 gap-x-10 col-start-2">
-                                    <button onClick={() => handleFinalAnswer()} className="px-3 py-2 bg-white rounded border w-full cursor-pointer hover:ring-blue-500 hover:ring-1 hover:bg-blue-50">Confirm</button>
-                                    <button onClick={router.back} className="px-3 py-2 bg-white rounded border w-full cursor-pointer hover:ring-red-500 hover:ring-1 hover:bg-red-50">Close</button>
+                    <div className='bg-gray-900 min-h-screen flex flex-col'>
+                        {warning && (
+                            <WarningToast
+                                message={warning}
+                                onClose={() => handleMessages()}
+                                type='error'
+                            />
+                        )}
+                        {success && (
+                            <WarningToast
+                                message={success}
+                                onClose={() => handleMessages()}
+                                type='success'
+                            />
+                        )}
+                        <div className='bg-gray-700 my-10 min-w-[800px] max-w-4xl w-full mx-auto rounded-lg p-5'>
+                            <div className='grid grid-cols-2 h-fit gap-x-10'>
+                                <div className='w-full grid grid-cols-2 gap-x-10 col-start-2'>
+                                    <button onClick={() => handleFinalAnswer()} className='px-3 py-2 bg-white rounded border w-full cursor-pointer hover:ring-blue-500 hover:ring-1 hover:bg-blue-50'>Confirm</button>
+                                    <button onClick={router.back} className='px-3 py-2 bg-white rounded border w-full cursor-pointer hover:ring-red-500 hover:ring-1 hover:bg-red-50'>Close</button>
                                 </div>
                             </div>
                         </div>

@@ -177,6 +177,55 @@ def insertUser():
         print(f"Erro inesperado: {str(e)}")
         return jsonify({'message': 'Internal server error', 'code': 500}), 500
     
+
+@app.route('/configure_user/existence', methods=['POST'])
+def isUserExistent():
+    data = request.json
+    user_code = data.get('user_code')
+    user_email = data.get('user_email')
+    token = request.cookies.get('token')
+    if not token:
+        return jsonify({'message': 'Unnauthorized', 'code': 401}), 401
     
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        result = db_procedures.is_usercode_existent(user_code)
+        if result['valid'] == True:
+            return jsonify({'message': 'User already exists!', 'code': 400}), 400
+        else:
+            result = db_procedures.is_useremail_existent(user_email)
+            if result['valid'] == True:
+                return jsonify({'message': 'User E-Mail is already in use!', 'code': 400}), 400
+            else:
+                return jsonify({'message': 'Success!', 'code': 200})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Expired token', 'code': 401}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token', 'code': 401}), 401
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        return jsonify({'message': 'Internal server error', 'code': 500}), 500
+    
+
+@app.route('/configure_user/delete', methods=['POST'])
+def deleteUser():
+    data = request.json
+    user_code = data.get('user_code')
+    token = request.cookies.get('token')
+    if not token:
+        return jsonify({'message': 'Unnauthorized', 'code': 401}), 401
+    
+    try:
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+        db_procedures.delete_user(user_code)
+        return jsonify({'message': 'Success', 'code': 200})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': 'Expired token', 'code': 401}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': 'Invalid token', 'code': 401}), 401
+    except Exception as e:
+        print(f"Erro inesperado: {str(e)}")
+        return jsonify({'message': 'Internal server error', 'code': 500}), 500
+
 if __name__ == "__main__":
     app.run(debug=True, port=8000)

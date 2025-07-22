@@ -72,3 +72,28 @@ def insert_user(user_data, company_id, branch_id):
     conn.commit()
     conn.close()
 
+
+def is_usercode_existent(user_code):
+    conn = db_connect()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_USERCODE_EXISTENCE, (user_code,))
+    result = cursor.fetchone()
+    conn.close()
+    return result
+
+
+def is_useremail_existent(user_email):
+    conn = db_connect()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_USEREMAIL_EXISTENCE, (user_email,))
+    result = cursor.fetchone()
+    conn.close()
+    return result
+
+
+def delete_user(user_code):
+    conn = db_connect()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(queries.SQL_DELETE_USER, (user_code,))
+    conn.commit()
+    conn.close()
